@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import {plugin} from 'puppeteer-with-fingerprints'
 
 const createAccount = async (
   nickname = null,
@@ -6,28 +7,26 @@ const createAccount = async (
 ) => {
   let browser = null;
   try {
-    browser = await puppeteer.launch({
-      executablePath:
-        "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    const fingerprints = await plugin.fetch('', {
+      tags: ['Microsoft Windows', 'Chrome'],
+    })
+    plugin.useFingerprint(fingerprints);
+    browser = await plugin.launch({
+      // executablePath:
+      //   "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       headless: false, 
-      args: ['--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-infobars',
-      '--window-position=0,0',
-      '--ignore-certifcate-errors',
-      '--ignore-certifcate-errors-spki-list',] 
+      args: ['--mute-audio'],
     });
     
     const twitch = await browser.newPage();
-    await twitch.setViewport({ width: 1920, height: 1080 });
+    // await twitch.setViewport({ width: 1920, height: 1080 });
     await twitch.goto("https://www.twitch.tv/");
-    await twitch.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.81 Safari/537.36');
 
     // const mailPage = await browser.newPage();
     // await mailPage.setViewport({ width: 1920, height: 1080 });
     // await mailPage.goto("https://temp-mail.org/en/10minutemail")
 
-    const email = 'kuba@wp.pl';
+    const email = 'kubaqwexs@wp.pl';
 
     // await twitch.bringToFront();
 
@@ -40,9 +39,9 @@ const createAccount = async (
     1 ? fillForm(twitch, nickname, password, email) : console.log('elo');
 
     await new Promise((r) => setTimeout(r, 2000));
-    await twitch.waitForSelector('button[type=submit]');
-    const submit = await twitch.$('button[type=submit]');
-    submit.click();
+    await twitch.waitForSelector('button[type="submit"]:not([disabled])');
+    const submit = await twitch.$('button[type="submit"]:not([disabled])');
+    await submit.click();
 
   } catch (error) {
     console.error("An error occurred:", error);
@@ -54,7 +53,7 @@ const createAccount = async (
 };
 
 const fillForm = async (page, nickanme, password, email) => {
-  nickanme = 'xxxtestowyenickname1234';
+  nickanme = 'xxxtestowyenickname1234xx';
   password = '2nVeMhH5r1d2EO8';
 
   await page.waitForSelector('#signup-username');
