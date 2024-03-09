@@ -1,5 +1,5 @@
-import puppeteer from "puppeteer";
-import {plugin} from 'puppeteer-with-fingerprints'
+import { plugin } from 'puppeteer-with-fingerprints'
+import { determineForm } from './functions/forms.js';
 
 const createAccount = async (
   nickname = null,
@@ -19,32 +19,34 @@ const createAccount = async (
     const twitch = await browser.newPage();
     await twitch.goto("https://www.twitch.tv/");
 
-    const mailPage = await browser.newPage();
-    await mailPage.setViewport({ width: 1920, height: 1080 });
-    await mailPage.goto("https://temp-mail.org/en/10minutemail")
+    // const mailPage = await browser.newPage();
+    // await mailPage.goto("https://temp-mail.org/en/10minutemail")
 
-    const email = await getEmail(mailPage);
+    // let mailPageInfo = await getMailPageInfo(mailPage);
+    // const email = mailPageInfo.mailbox.trim();
+    const email = 'cskjndcak@gmail.com';
+    nickname = nickname ?? 'dfkasdjncljjnzx';
+    password = password ?? 'czxmclizimlasmc';
 
     //TODO divide this file into many other files in functions folder
-
-    await new Promise((r) => setTimeout(r, 20000));
-
-    // const email = 'kubaqwexs@wp.pl';
+    // ('[pattern="[0-9]*"]') - code verification pattern inputs
 
     // await twitch.bringToFront();
 
-    // const signUpButton = await getSignUpButton(twitch);
-    // await clickButton(signUpButton, "Sign Up");
+    const signUpButton = await getSignUpButton(twitch);
+    await clickButton(signUpButton, "Sign Up");
 
-    // // Determine which form is presented
-    // // #email-input
-
+    const form = await determineForm(twitch);
+    await form.fill(twitch, nickname, password, email);
+    
     // 1 ? fillForm(twitch, nickname, password, email) : console.log('elo');
 
     // await new Promise((r) => setTimeout(r, 2000));
     // await twitch.waitForSelector('button[type="submit"]:not([disabled])');
     // const submit = await twitch.$('button[type="submit"]:not([disabled])');
     // await submit.click();
+
+    await new Promise(n => setTimeout(n, 20000))
 
   } catch (error) {
     console.error("An error occurred:", error);
@@ -55,28 +57,28 @@ const createAccount = async (
   }
 };
 
-const fillForm = async (page, nickanme, password, email) => {
-  nickanme = 'xxxtestowyenickname1234xx';
-  password = '2nVeMhH5r1d2EO8';
+// const fillForm = async (page, nickanme, password, email) => {
+//   nickanme = 'xxxtestowyenickname1234xx';
+//   password = '2nVeMhH5r1d2EO8';
 
-  await page.waitForSelector('#signup-username');
-  await page.waitForSelector('#password-input-confirmation');
-  await page.type('#signup-username', nickanme);
-  await page.type('#password-input', password);
-  await page.type('#password-input-confirmation', password)
-  await page.type('[data-a-target=birthday-date-input] > input', '1');
-  await page.type('[data-a-target=birthday-year-input] > input', '2000');
+//   await page.waitForSelector('#signup-username');
+//   await page.waitForSelector('#password-input-confirmation');
+//   await page.type('#signup-username', nickanme);
+//   await page.type('#password-input', password);
+//   await page.type('#password-input-confirmation', password)
+//   await page.type('[data-a-target=birthday-date-input] > input', '1');
+//   await page.type('[data-a-target=birthday-year-input] > input', '2000');
   
-  await page.waitForSelector('[data-a-target=signup-phone-email-toggle]');
-  const mailToggleButton = await page.$('[data-a-target=signup-phone-email-toggle]');
-  await mailToggleButton.click();
-  await new Promise((r) => setTimeout(r, 500));
-  await page.waitForSelector('#email-input')
-  await page.type('#email-input', email);
+//   await page.waitForSelector('[data-a-target=signup-phone-email-toggle]');
+//   const mailToggleButton = await page.$('[data-a-target=signup-phone-email-toggle]');
+//   await mailToggleButton.click();
+//   await new Promise((r) => setTimeout(r, 500));
+//   await page.waitForSelector('#email-input')
+//   await page.type('#email-input', email);
 
-  await page.waitForSelector('[data-a-target=birthday-month-select]');
-  await page.select('[data-a-target=birthday-month-select]', '1');
-}
+//   await page.waitForSelector('[data-a-target=birthday-month-select]');
+//   await page.select('[data-a-target=birthday-month-select]', '1');
+// }
 
 const clickButton = async (button, buttonName) => {
   try {
@@ -100,19 +102,18 @@ const getSignUpButton = async (page) => {
   }
 };
 
-const getEmail = async (page) => {
+const getMailPageInfo = async (page) => {
   const timeout = 20000, startTime = Date.now();;
-  let responseReceived = false, email = '';
+  let responseReceived = false, result = '';
 
   const responseHandler = async (response) => {
     const url = response.url();
     if (url.includes('https://web2.temp-mail.org/messages')) {
       if (response.status() === 200) {
-          const body = await response.json();
-          const email = body.mailbox.trim();
-          console.log(email);
-          responseReceived = true;
-          page.off('response', responseHandler);
+        result = await response.json();
+        console.log(result);
+        responseReceived = true;
+        page.off('response', responseHandler);
       }
     }
   };
@@ -126,7 +127,7 @@ const getEmail = async (page) => {
     await new Promise(resolve => setTimeout(resolve, 100)); // Odczekaj 100 ms
   }
 
-  return email;
+  return result;
 };
 
 export default createAccount;
