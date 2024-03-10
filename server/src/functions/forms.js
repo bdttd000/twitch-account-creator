@@ -20,6 +20,13 @@ const forms = {
 
       await page.waitForSelector('[data-a-target=birthday-month-select]');
       await page.select('[data-a-target=birthday-month-select]', '1');
+
+      const randomText = await page.$('#modal-root-header');
+      await randomText.click();
+      await new Promise((r) => setTimeout(r, 5000));
+      await page.waitForSelector('button[type="submit"]:not([disabled])');
+      const submit = await page.$('button[type="submit"]:not([disabled])');
+      await submit.click();
     }
   },
   basic: {
@@ -41,6 +48,13 @@ const forms = {
 
       await page.waitForSelector('[data-a-target=birthday-month-select]');
       await page.select('[data-a-target=birthday-month-select]', '1');
+
+      const randomText = await page.$('#modal-root-header');
+      await randomText.click();
+      await new Promise((r) => setTimeout(r, 5000));
+      await page.waitForSelector('button[type="submit"]:not([disabled])');
+      const submit = await page.$('button[type="submit"]:not([disabled])');
+      await submit.click();
     }
   },
   multiStep: {
