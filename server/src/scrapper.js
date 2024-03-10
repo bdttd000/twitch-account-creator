@@ -1,5 +1,6 @@
 import { plugin } from 'puppeteer-with-fingerprints'
 import { determineForm } from './functions/forms.js';
+import { generateString } from './functions/stringGenerator.js';
 
 const createAccount = async (
   nickname = null,
@@ -24,9 +25,9 @@ const createAccount = async (
 
     // let mailPageInfo = await getMailPageInfo(mailPage);
     // const email = mailPageInfo.mailbox.trim();
-    const email = 'cskjndcak@gmail.com';
-    nickname = nickname ?? 'dfkasdjncljjnzx';
-    password = password ?? 'czxmclizimlasmc';
+    const email = generateString(10) + '@gmail.com';
+    nickname = nickname ?? generateString(12);
+    password = password ?? generateString(12);
 
     //TODO divide this file into many other files in functions folder
     // ('[pattern="[0-9]*"]') - code verification pattern inputs
@@ -38,13 +39,6 @@ const createAccount = async (
 
     const form = await determineForm(twitch);
     await form.fill(twitch, nickname, password, email);
-    
-    // 1 ? fillForm(twitch, nickname, password, email) : console.log('elo');
-
-    // await new Promise((r) => setTimeout(r, 2000));
-    // await twitch.waitForSelector('button[type="submit"]:not([disabled])');
-    // const submit = await twitch.$('button[type="submit"]:not([disabled])');
-    // await submit.click();
 
     await new Promise(n => setTimeout(n, 20000))
 
