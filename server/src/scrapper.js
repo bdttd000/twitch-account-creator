@@ -6,14 +6,14 @@ const createAccount = async (
   nickname = null,
   password = null
 ) => {
-  let browser = null;
+  let returnData, browser = null, error = null;
   try {
     const fingerprints = await plugin.fetch('', {
       tags: ['Microsoft Windows', 'Chrome'],
     })
     plugin.useFingerprint(fingerprints);
     browser = await plugin.launch({
-      // headless: false, 
+      headless: false, 
       args: ['--mute-audio'],
     });
     
@@ -25,8 +25,8 @@ const createAccount = async (
 
     let mailPageInfo = await getMailPageInfo(mailPage);
     if (!mailPageInfo) {
-      console.error('Mail not found')
-      return;
+      error = {status: 400, data: {message: 'Mail not found', restart: false}}
+      throw new Error("Mail not found");
     }
     const email = mailPageInfo.mailbox.trim();
 
@@ -49,14 +49,9 @@ const createAccount = async (
 
     const element = await twitch.$('[role=alert]');
     if (element) {
-      console.error('Browser not supported')
-      return;
+      error = {status: 400, data: {message: 'Browser not supported', restart: true}}
+      throw new Error("Browser not supported");
     }
-
-    // const isBrowserValid = await waitForSelector(twitch, 'input[pattern="[0-9]*"]', 10000);
-    // if (!isBrowserValid) {
-    //   console.log('browser not supported');
-    // }
 
     await mailPage.bringToFront();
     do {
@@ -64,7 +59,7 @@ const createAccount = async (
     } while (!mailPageInfo.messages[0] || !mailPageInfo.messages[0].subject)
     const verificationCode = await mailPageInfo.messages[0].subject.substring(0,6);
 
-    console.log(nickname, password, verificationCode);
+    returnData = {status: 200, data: {nickname: nickname, password: password, verificationCode: verificationCode}};
 
   } catch (error) {
     console.error("An error occurred:", error);
@@ -73,6 +68,8 @@ const createAccount = async (
       await browser.close();
     }
   }
+
+  return error ? error : returnData;
 };
 
 async function waitForSelector(page, selector, timeout) {

@@ -11,9 +11,10 @@ app.get("/", (req, res) => {
   res.send("Express + TypeScript Server");
 });
 
-app.get("/create", (req, res) => {
-  createAccount();
-  res.send("Express + TypeScript Server");
+app.get("/create", async (req, res) => {
+  const result = await createAccount();
+  console.log(result)
+  res.status(200).json(result);
 });
 
 app.listen(port, () => {
