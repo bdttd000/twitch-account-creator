@@ -2,7 +2,6 @@ const forms = {
   passwordRepeat: {
     identify: async (page) => await page.$('#password-input-confirmation'),
     fill: async (page, nickname, password, email) => {
-      console.log('Form - passwordRepeat');
       await page.waitForSelector('#signup-username');
       await page.waitForSelector('#password-input-confirmation');
       await page.type('#signup-username', nickname);
@@ -23,13 +22,12 @@ const forms = {
 
       const randomText = await page.$('#modal-root-header');
       await randomText.click();
-      await new Promise((r) => setTimeout(r, 5000));
+      await new Promise((r) => setTimeout(r, 3000));
     }
   },
   basic: {
     identify: async (page) => await page.$('#password-input'),
     fill: async (page, nickname, password, email) => {
-      console.log('Form - basic');
       await page.waitForSelector('#signup-username');
       await page.type('#signup-username', nickname);
       await page.type('#password-input', password);
@@ -48,14 +46,14 @@ const forms = {
 
       const randomText = await page.$('#modal-root-header');
       await randomText.click();
-      await new Promise((r) => setTimeout(r, 5000));
+      await new Promise((r) => setTimeout(r, 3000));
     }
   },
   multiStep: {
     identify: async (page) => await page.$('#signup-username'),
     fill: async (page, nickname, password, email) => {
-      console.log('Form - multiStep');
-      // cant reach this type of form to prepare script
+      // cant reach this type of form to prepare script, but it exists
+      console.error('Multistep form');
     }
   }
 };

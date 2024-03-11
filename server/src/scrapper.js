@@ -13,7 +13,7 @@ const createAccount = async (
     })
     plugin.useFingerprint(fingerprints);
     browser = await plugin.launch({
-      headless: false, 
+      // headless: false, 
       args: ['--mute-audio'],
     });
     
@@ -24,9 +24,11 @@ const createAccount = async (
     await mailPage.goto("https://temp-mail.org/en/10minutemail")
 
     let mailPageInfo = await getMailPageInfo(mailPage);
+    if (!mailPageInfo) {
+      console.error('Mail not found')
+      return;
+    }
     const email = mailPageInfo.mailbox.trim();
-
-    console.log(email);
 
     nickname = nickname ?? generateString(12);
     password = password ?? generateString(12);
@@ -43,22 +45,26 @@ const createAccount = async (
     const submit = await twitch.$('button[type="submit"]:not([disabled])');
     await clickButton(submit, "Form submit");
 
-    await twitch.waitForSelector('input[pattern="[0-9]*"]');
+    await new Promise(r => setTimeout(r, 3000));
 
-    await mailPage.bringToFront();
-    mailPageInfo = await getMailPageInfo(mailPage);
-    const verificationCode = await mailPageInfo.messages[0].subject.substring(0,6);
-
-    await twitch.bringToFront();
-    await twitch.waitForSelector('input[pattern="[0-9]*"]');
-    const verificationInput = await twitch.$$('input[pattern="[0-9]*"]');
-    for (const [index, input] of verificationInput.entries()) {
-      await input.type(verificationCode[index]);
+    const element = await twitch.$('[role=alert]');
+    if (element) {
+      console.error('Browser not supported')
+      return;
     }
 
-    await new Promise((n) => setTimeout(n, 2000))
+    // const isBrowserValid = await waitForSelector(twitch, 'input[pattern="[0-9]*"]', 10000);
+    // if (!isBrowserValid) {
+    //   console.log('browser not supported');
+    // }
 
-    console.log(nickname, password, email);
+    await mailPage.bringToFront();
+    do {
+      mailPageInfo = await getMailPageInfo(mailPage);
+    } while (!mailPageInfo.messages[0] || !mailPageInfo.messages[0].subject)
+    const verificationCode = await mailPageInfo.messages[0].subject.substring(0,6);
+
+    console.log(nickname, password, verificationCode);
 
   } catch (error) {
     console.error("An error occurred:", error);
@@ -68,6 +74,18 @@ const createAccount = async (
     }
   }
 };
+
+async function waitForSelector(page, selector, timeout) {
+  try {
+      await page.waitForSelector(selector, { timeout });
+      return true;
+  } catch (error) {
+      if (error.name === 'TimeoutError') {
+          return false; 
+      }
+      throw error;
+  }
+}
 
 const clickButton = async (button, buttonName) => {
   try {
@@ -92,7 +110,7 @@ const getSignUpButton = async (page) => {
 };
 
 const getMailPageInfo = async (page) => {
-  const timeout = 20000, startTime = Date.now();;
+  const timeout = 10000, startTime = Date.now();
   let responseReceived = false, result = '';
 
   const responseHandler = async (response) => {
@@ -100,7 +118,6 @@ const getMailPageInfo = async (page) => {
     if (url.includes('https://web2.temp-mail.org/messages')) {
       if (response.status() === 200) {
         result = await response.json();
-        console.log(result);
         responseReceived = true;
         page.off('response', responseHandler);
       }
@@ -111,31 +128,12 @@ const getMailPageInfo = async (page) => {
 
   while (!responseReceived) {
     if (Date.now() - startTime > timeout) {
-        throw new Error('Email not found');
+        return null;
     }
-    await new Promise(resolve => setTimeout(resolve, 100)); // Odczekaj 100 ms
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   return result;
 };
 
 export default createAccount;
-
-// Do klikniecia przycisku
-// await new Promise((r) => setTimeout(r, 2000));
-// await page.waitForSelector('button[type=submit]');
-// let submit = await page.$('button[type=submit]');
-// submit.click();
-
-// #signup-username
-// #password-input
-// #password-input-confirmation
-
-// [data-a-target=birthday-date-input] > input
-// [data-a-target=birthday-month-select]
-// [data-a-target=birthday-year-input] > input
-
-// [data-a-target=signup-phone-email-toggle] click
-// #email-input
-
-// [data-a-target=passport-signup-button]
