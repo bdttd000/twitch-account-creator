@@ -49,16 +49,17 @@ const createAccount = async (
     mailPageInfo = await getMailPageInfo(mailPage);
     const verificationCode = await mailPageInfo.messages[0].subject.substring(0,6);
 
-    await twitch.bringToFront();
-    await twitch.waitForSelector('input[pattern="[0-9]*"]');
-    const verificationInput = await twitch.$$('input[pattern="[0-9]*"]');
-    for (const [index, input] of verificationInput.entries()) {
-      await input.type(verificationCode[index]);
-    }
+    
+    // await twitch.bringToFront();
+    // await twitch.waitForSelector('input[pattern="[0-9]*"]');
+    // const verificationInput = await twitch.$$('input[pattern="[0-9]*"]');
+    // for (const [index, input] of verificationInput.entries()) {
+    //   await input.type(verificationCode[index]);
+    // }
 
-    await new Promise((n) => setTimeout(n, 2000))
+    await new Promise((n) => setTimeout(n, 2000));
 
-    console.log(nickname, password, email);
+    console.log(nickname, password, email, verificationCode);
 
   } catch (error) {
     console.error("An error occurred:", error);
