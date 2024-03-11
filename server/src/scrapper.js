@@ -20,19 +20,18 @@ const createAccount = async (
     const twitch = await browser.newPage();
     await twitch.goto("https://www.twitch.tv/");
 
-    // const mailPage = await browser.newPage();
-    // await mailPage.goto("https://temp-mail.org/en/10minutemail")
+    const mailPage = await browser.newPage();
+    await mailPage.goto("https://temp-mail.org/en/10minutemail")
 
-    // let mailPageInfo = await getMailPageInfo(mailPage);
-    // const email = mailPageInfo.mailbox.trim();
-    const email = generateString(10) + '@gmail.com';
+    let mailPageInfo = await getMailPageInfo(mailPage);
+    const email = mailPageInfo.mailbox.trim();
+
+    console.log(email);
+
     nickname = nickname ?? generateString(12);
     password = password ?? generateString(12);
 
-    //TODO divide this file into many other files in functions folder
-    // ('[pattern="[0-9]*"]') - code verification pattern inputs
-
-    // await twitch.bringToFront();
+    await twitch.bringToFront();
 
     const signUpButton = await getSignUpButton(twitch);
     await clickButton(signUpButton, "Sign Up");
@@ -40,39 +39,35 @@ const createAccount = async (
     const form = await determineForm(twitch);
     await form.fill(twitch, nickname, password, email);
 
-    await new Promise(n => setTimeout(n, 20000))
+    await twitch.waitForSelector('button[type="submit"]:not([disabled])');
+    const submit = await twitch.$('button[type="submit"]:not([disabled])');
+    await clickButton(submit, "Form submit");
+
+    await twitch.waitForSelector('input[pattern="[0-9]*"]');
+
+    await mailPage.bringToFront();
+    mailPageInfo = await getMailPageInfo(mailPage);
+    const verificationCode = await mailPageInfo.messages[0].subject.substring(0,6);
+
+    await twitch.bringToFront();
+    await twitch.waitForSelector('input[pattern="[0-9]*"]');
+    const verificationInput = await twitch.$$('input[pattern="[0-9]*"]');
+    for (const [index, input] of verificationInput.entries()) {
+      await input.type(verificationCode[index]);
+    }
+
+    await new Promise((n) => setTimeout(n, 2000))
+
+    console.log(nickname, password, email);
 
   } catch (error) {
     console.error("An error occurred:", error);
   } finally {
-    // if (browser !== null) {
-    //   await browser.close();
-    // }
+    if (browser !== null) {
+      await browser.close();
+    }
   }
 };
-
-// const fillForm = async (page, nickanme, password, email) => {
-//   nickanme = 'xxxtestowyenickname1234xx';
-//   password = '2nVeMhH5r1d2EO8';
-
-//   await page.waitForSelector('#signup-username');
-//   await page.waitForSelector('#password-input-confirmation');
-//   await page.type('#signup-username', nickanme);
-//   await page.type('#password-input', password);
-//   await page.type('#password-input-confirmation', password)
-//   await page.type('[data-a-target=birthday-date-input] > input', '1');
-//   await page.type('[data-a-target=birthday-year-input] > input', '2000');
-  
-//   await page.waitForSelector('[data-a-target=signup-phone-email-toggle]');
-//   const mailToggleButton = await page.$('[data-a-target=signup-phone-email-toggle]');
-//   await mailToggleButton.click();
-//   await new Promise((r) => setTimeout(r, 500));
-//   await page.waitForSelector('#email-input')
-//   await page.type('#email-input', email);
-
-//   await page.waitForSelector('[data-a-target=birthday-month-select]');
-//   await page.select('[data-a-target=birthday-month-select]', '1');
-// }
 
 const clickButton = async (button, buttonName) => {
   try {
