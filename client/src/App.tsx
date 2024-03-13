@@ -18,18 +18,22 @@ const App = () => {
   const [status, setStatus] = useState("");
   const [responseError, setResponseError] = useState<errorData | null>(null);
   const [content, setContent] = useState<fetchData>();
+  const [isButtonActive, setIsButtonActive] = useState<boolean>(true);
+
+  const addAccountToAccountsArray = (account: fetchData) => {
+    setAccountsArray([...accountsArray, account]);
+  };
 
   const createAccount = async (): Promise<void> => {
-    console.log(accountsArray);
+    setIsButtonActive(false);
     setResponseError(null);
     setStatus("Creating account");
 
     await fetch("/create")
       .then((response) => response.json())
       .then((response) => {
-        console.log(response);
         if (response.status === 200) {
-          setAccountsArray([...accountsArray, response.data]);
+          addAccountToAccountsArray(response.data);
           setContent(response.data);
           setStatus("Account created");
         } else {
@@ -38,21 +42,20 @@ const App = () => {
         }
       });
 
-    if (!responseError || responseError?.restart === true) {
-      setStatus("Retrying the operation");
-      createAccount();
-    }
-
-    console.log(accountsArray);
-    console.log(responseError);
-    console.log(status);
+    setIsButtonActive(true);
   };
 
   return (
     <div className="App">
       <header className="App-header">
         <div>
-          <button onClick={createAccount}>elo elo</button>
+          <button
+            className="button"
+            onClick={createAccount}
+            disabled={!isButtonActive}
+          >
+            Create account
+          </button>
         </div>
         <div>{responseError?.message ? responseError.message : ""}</div>
         <div>{status}</div>

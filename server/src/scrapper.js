@@ -13,7 +13,7 @@ const createAccount = async (
     })
     plugin.useFingerprint(fingerprints);
     browser = await plugin.launch({
-      headless: false, 
+      // headless: false, 
       args: ['--mute-audio'],
     });
     
