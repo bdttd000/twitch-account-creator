@@ -58,7 +58,7 @@ const forms = {
   }
 };
 
-export const determineForm = async (page) => {
+const determineForm = async (page) => {
   await page.waitForSelector('#signup-username')
   for (const formKey in forms) {
     if (await forms[formKey].identify(page)) {
@@ -67,3 +67,5 @@ export const determineForm = async (page) => {
   }
   console.error('Unknown form');
 }
+
+export default determineForm
