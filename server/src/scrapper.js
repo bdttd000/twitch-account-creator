@@ -1,6 +1,8 @@
 import { plugin } from 'puppeteer-with-fingerprints'
-import { determineForm } from './functions/forms.js';
 import { generateString } from './functions/stringGenerator.js';
+import { clickButton, getSignUpButton } from './functions/buttons.js';
+import getMailPageInfo from './functions/mailPageInfo.js';
+import determineForm from './functions/forms.js';
 
 const createAccount = async (
   nickname = null,
@@ -13,7 +15,7 @@ const createAccount = async (
     })
     plugin.useFingerprint(fingerprints);
     browser = await plugin.launch({
-      // headless: false, 
+      // headless: false, //uncomment if u want to see what's happening during process
       args: ['--mute-audio'],
     });
     
@@ -70,67 +72,6 @@ const createAccount = async (
   }
 
   return error ? error : returnData;
-};
-
-async function waitForSelector(page, selector, timeout) {
-  try {
-      await page.waitForSelector(selector, { timeout });
-      return true;
-  } catch (error) {
-      if (error.name === 'TimeoutError') {
-          return false; 
-      }
-      throw error;
-  }
-}
-
-const clickButton = async (button, buttonName) => {
-  try {
-    if (button) {
-      await button.click();
-    } else {
-      throw new Error(`Button "${buttonName}" not found`);
-    }
-  } catch (error) {
-    throw error;
-  }
-};
-
-const getSignUpButton = async (page) => {
-  try {
-    await page.waitForSelector("[data-a-target=signup-button]")
-    return await page.$("[data-a-target=signup-button]");
-  } catch (error) {
-    console.error("An error occurred:", error);
-    throw error
-  }
-};
-
-const getMailPageInfo = async (page) => {
-  const timeout = 10000, startTime = Date.now();
-  let responseReceived = false, result = '';
-
-  const responseHandler = async (response) => {
-    const url = response.url();
-    if (url.includes('https://web2.temp-mail.org/messages')) {
-      if (response.status() === 200) {
-        result = await response.json();
-        responseReceived = true;
-        page.off('response', responseHandler);
-      }
-    }
-  };
-
-  page.on('response', responseHandler);
-
-  while (!responseReceived) {
-    if (Date.now() - startTime > timeout) {
-        return null;
-    }
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  return result;
 };
 
 export default createAccount;

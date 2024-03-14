@@ -12,7 +12,6 @@ app.get("/", (req, res) => {
 });
 
 app.get("/create", async (req, res) => {
-  await new Promise(r => setTimeout(r, 1000))
   const result = await createAccount();
   res.status(200).json(result);
 });
