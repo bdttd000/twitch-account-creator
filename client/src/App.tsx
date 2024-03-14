@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 
 interface fetchData {
@@ -19,10 +19,7 @@ const App = () => {
   const [responseError, setResponseError] = useState<errorData | null>(null);
   const [content, setContent] = useState<fetchData>();
   const [isButtonActive, setIsButtonActive] = useState<boolean>(true);
-
-  const addAccountToAccountsArray = (account: fetchData) => {
-    setAccountsArray([...accountsArray, account]);
-  };
+  const accountsArrayRef = useRef(accountsArray);
 
   const createAccount = async (): Promise<void> => {
     setIsButtonActive(false);
@@ -33,16 +30,22 @@ const App = () => {
       .then((response) => response.json())
       .then((response) => {
         if (response.status === 200) {
-          addAccountToAccountsArray(response.data);
+          accountsArrayRef.current.push(response.data);
+          setAccountsArray([...accountsArrayRef.current]);
           setContent(response.data);
           setStatus("Account created");
         } else {
           setResponseError(response.data);
           setStatus("Failed");
         }
-      });
 
-    setIsButtonActive(true);
+        if (response.data.restart === undefined || response.data.restart) {
+          createAccount();
+          return;
+        }
+
+        setIsButtonActive(true);
+      });
   };
 
   return (
