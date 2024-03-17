@@ -65,7 +65,7 @@ const App = () => {
         <br />
         <div>
           <div>Nickname: {content?.nickname}</div>
-          <div>Passowrd: {content?.password}</div>
+          <div>Password: {content?.password}</div>
           <div>Verification code: {content?.verificationCode}</div>
         </div>
         <br />
