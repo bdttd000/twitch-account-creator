@@ -4,9 +4,7 @@ This repository contains scripts to generate twitch accounts with verification c
 
 Short video of the script getting data.
 
-<!-- TODO - upload video -->
-
-<video src='https://youtu.be/NL-zfbUXaiY' width=300></video>
+https://github.com/bdttd000/twitch-account-creator/assets/44643460/a14a3820-cd91-4b9f-94a4-8021c4489df5
 
 ### How it works
 
