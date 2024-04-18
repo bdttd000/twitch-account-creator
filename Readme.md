@@ -6,11 +6,15 @@ Short video of the script getting data.
 
 <!-- TODO - upload video -->
 
+<video src='https://youtu.be/NL-zfbUXaiY' width=300></video>
+
 ### How it works
 
 <!-- TODO - upload video and instruction -->
 
 ### Setup
+
+### Example output
 
 clone repository
 go to main folder and execute commands
