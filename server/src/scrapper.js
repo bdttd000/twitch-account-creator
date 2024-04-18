@@ -33,7 +33,7 @@ const createAccount = async (
     const email = mailPageInfo.mailbox.trim();
 
     nickname = nickname ?? generateString(12);
-    password = password ?? generateString(12);
+    password = password ?? generateString(12) + 'aA1!';
 
     await twitch.bringToFront();
 
