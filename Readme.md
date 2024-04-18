@@ -29,7 +29,7 @@ Script may fail if our [puppeteer](https://github.com/CheshireCaat/puppeteer-wit
 
 The string you will get consists of [login] [passowrd] [verification_code]
 
-![example_account.png](exapmle_account.png)
+![example_account.png](readme_files/exapmle_account.png)
 
 ### Why don't we activate account right away?
 
