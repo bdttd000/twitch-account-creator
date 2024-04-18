@@ -17,9 +17,11 @@ go to main folder and execute commands
 
 - first terminal
   `cd .\client\`
+  `npm install`
   `npm start`
 - second terminal
   `cd .\server\`
+  `npm install`
   `npm start`
 
 now you can open [Localhost](http://localhost:3000/) and execute program
