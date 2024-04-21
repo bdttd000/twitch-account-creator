@@ -55,3 +55,8 @@ now you can open [Localhost](http://localhost:3000/) and execute program
 
 - Script has arguments such as 'login' and 'password', but i assume they will be useless as these accounts are fragile. We don't have access to the email so any ban is probably permanent.
 - There is an option to add captcha solver which will solve our problem with vpn.
+
+### Possible errors
+
+- There are three different types of registration forms on Twitch, but the script only handles two of them correctly because the third one occurs very rarely. If it becomes a problem, I will fix it.
+- The captcha will block us from obtaining the email. There are two solutions to this. Either you uncomment the 'headless: false' option in 'server/src/scrapper.js' and pass it manually, or you can implement a captcha solver.
