@@ -41,11 +41,11 @@ clone repository
 go to main folder and execute commands
 
 - first terminal
-  `cd .\client\`
+  `cd .\server\`
   `npm install`
   `npm start`
 - second terminal
-  `cd .\server\`
+  `cd .\client\`
   `npm install`
   `npm start`
 
